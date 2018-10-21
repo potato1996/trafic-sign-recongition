@@ -21,10 +21,8 @@ parser.add_argument('--momentum', type=float, default=0.9, metavar='M',
                     help='SGD momentum (default: 0.9)')
 parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')
-parser.add_argument('--log-interval', type=int, default=10, metavar='N',
+parser.add_argument('--log-interval', type=int, default=40, metavar='N',
                     help='how many batches to wait before logging training status')
-parser.add_argument('--check-point', type=str, default=None, metavar='C',
-                            help='resume from a checkpoint')
 args = parser.parse_args()
 
 torch.cuda.manual_seed(args.seed)
@@ -44,24 +42,18 @@ val_loader = torch.utils.data.DataLoader(
 
 ### Neural Network and Optimizer
 # We define neural net in model.py so that it can be reused by the evaluate.py script
-from model import DenseNet
-from model import Net
-model = DenseNet(growth_rate = 24, # K
-                 block_config = (32,32,32), # (L - 4)/6
-                 num_init_features = 48, # 2 * growth rate
+from model import Net, DenseNet, STN_DenseNet
+model = STN_DenseNet(growth_rate = 20, # K
+                 block_config = (28,28,28), # (L - 4)/6
+                 num_init_features = 40, # 2 * growth rate
                  bn_size = 4,
                  drop_rate = 0.05,
                  num_classes = 43)
-
-# load model from a check point
-if args.check_point:
-        state_dict = torch.load(args.check_point)
-        model.load_state_dict(state_dict)
-
+print(model)
 model = model.cuda()
 
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum, nesterov=True)
-scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=[20, 40], gamma=0.1)
+scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=[20, 40, 60], gamma=0.1)
 
 def train(epoch):
     model.train()
@@ -93,7 +85,7 @@ def validation():
     validation_loss /= len(val_loader.dataset)
     print('\nValidation set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)\n'.format(
         validation_loss, correct, len(val_loader.dataset),
-        100.0 * correct / len(val_loader.dataset)))
+        100. * correct / len(val_loader.dataset)))
 
 
 for epoch in range(1, args.epochs + 1):

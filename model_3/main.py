@@ -21,7 +21,7 @@ parser.add_argument('--momentum', type=float, default=0.9, metavar='M',
                     help='SGD momentum (default: 0.9)')
 parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')
-parser.add_argument('--log-interval', type=int, default=10, metavar='N',
+parser.add_argument('--log-interval', type=int, default=40, metavar='N',
                     help='how many batches to wait before logging training status')
 args = parser.parse_args()
 
@@ -55,7 +55,7 @@ print(model)
 model = model.cuda()
 
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum, nesterov=True)
-scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=[15, 30, 45], gamma=0.1)
+scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=[5, 20, 35, 50], gamma=0.1)
 
 def train(epoch):
     model.train()

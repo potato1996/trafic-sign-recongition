@@ -15,7 +15,7 @@ data_transforms = transforms.Compose([
 ])
 
 train_transforms = transforms.Compose([
-    transforms.ColorJitter(0.20, 0.20),
+    transforms.ColorJitter(0.2, 0.2),
     transforms.RandomAffine(degrees=15, shear=15),
     transforms.RandomResizedCrop(size=32, scale=(0.8, 1.25)),
     transforms.ToTensor(),
